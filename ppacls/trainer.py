@@ -322,7 +322,7 @@ class PPAClsTrainer(object):
             if local_rank == 0:
                 if self.stop_eval: continue
                 logger.info('=' * 70)
-                self.eval_loss, self.eval_acc = self.evaluate()
+                
                 logger.info('Test epoch: {}, time/epoch: {}, loss: {:.5f}, accuracy: {:.5f}'.format(
                     epoch_id, str(timedelta(seconds=(time.time() - start_epoch))), self.eval_loss, self.eval_acc))
                 logger.info('=' * 70)
@@ -330,16 +330,18 @@ class PPAClsTrainer(object):
                 writer.add_scalar('Test/Loss', self.eval_loss, self.test_log_step)
                 self.test_log_step += 1
                 self.model.train()
-                # 保存最优模型
-                if self.eval_acc >= best_acc:
-                    best_acc = self.eval_acc
-                    save_checkpoint(configs=self.configs, model=self.model, optimizer=self.optimizer,
-                                    amp_scaler=self.amp_scaler, save_model_path=save_model_path, epoch_id=epoch_id,
-                                    accuracy=self.eval_acc, best_model=True)
-                # 保存模型
-                save_checkpoint(configs=self.configs, model=self.model, optimizer=self.optimizer,
-                                amp_scaler=self.amp_scaler, save_model_path=save_model_path, epoch_id=epoch_id,
-                                accuracy=self.eval_acc)
+                if epoch_id  % 10 == 0:
+                    self.eval_loss, self.eval_acc = self.evaluate()
+                    # 保存最优模型
+                    if self.eval_acc >= best_acc:
+                        best_acc = self.eval_acc
+                        save_checkpoint(configs=self.configs, model=self.model, optimizer=self.optimizer,
+                                        amp_scaler=self.amp_scaler, save_model_path=save_model_path, epoch_id=epoch_id,
+                                        accuracy=self.eval_acc, best_model=True)
+                    # # 保存模型
+                    # save_checkpoint(configs=self.configs, model=self.model, optimizer=self.optimizer,
+                    #                 amp_scaler=self.amp_scaler, save_model_path=save_model_path, epoch_id=epoch_id,
+                    #                 accuracy=self.eval_acc)
 
     def evaluate(self, resume_model=None, save_matrix_path=None):
         """

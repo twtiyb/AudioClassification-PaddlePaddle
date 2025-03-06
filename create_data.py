@@ -1,4 +1,13 @@
 import os
+import argparse
+import functools
+
+from ppacls.trainer import PPAClsTrainer
+from ppacls.utils.utils import add_arguments, print_arguments
+
+import os.path
+import shutil
+ 
 
 
 # 生成数据列表
@@ -86,13 +95,37 @@ def create_UrbanSound8K_list(audio_path, metadata_path, list_path):
     f_test.close()
     f_train.close()
 
+def create_model_label(audio_path, label_path):
+    if not os.path.exists(label_path):
+        os.makedirs(label_path)
+    f_train = open(os.path.join(label_path, 'train_list.txt'), 'w', encoding='utf-8')
+    f_test = open(os.path.join(label_path, 'test_list.txt'), 'w', encoding='utf-8')
+    f_label = open(os.path.join(label_path, 'label_list.txt'), 'w', encoding='utf-8')
 
-if __name__ == '__main__':
-    # get_data_list('dataset/audio', 'dataset')
-    # 生成生成方言数据列表
-    # get_language_identification_data_list(audio_path='dataset/language',
-    #                                       list_path='dataset/')
-    # 创建UrbanSound8K数据列表
-    create_UrbanSound8K_list(audio_path='dataset/UrbanSound8K/audio',
-                             metadata_path='dataset/UrbanSound8K/metadata/UrbanSound8K.csv',
-                             list_path='dataset')
+
+    types = list(filter(lambda x: not x.startswith('.'), os.listdir(audio_path)))
+    for type_index,type  in enumerate(types):
+        f_label.write(f'{type_index}\n')
+        audios = os.listdir(os.path.join(audio_path, type))
+        for file_index, audio   in enumerate(audios):
+            sound_path = os.path.join(audio_path, type, audio)
+            if file_index % 10 == 0:
+                f_test.write(f'{sound_path}\t{type_index}\n')
+            else:
+                f_train.write(f'{sound_path}\t{type_index}\n')
+    f_label.close()
+    f_test.close()
+    f_train.close()
+
+if __name__ == '__main__': 
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_arg = functools.partial(add_arguments, argparser=parser)
+    add_arg('model_name',          str,    'dog_cat',        '模型名称')
+    args = parser.parse_args()
+    print_arguments(args=args)
+
+    # mode_name = "dog"
+    mode_name = args.model_name
+    src_path = f"dataset/{mode_name}/audio"
+    dst_path = f"dataset/{mode_name}/label"
+    create_model_label(src_path, dst_path)
