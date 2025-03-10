@@ -6,10 +6,10 @@ from ppacls.utils.utils import add_arguments, print_arguments
 
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
-add_arg('model_name',              str,    'dog_cat',        '模型名称')
+add_arg('model_name',              str,    'dog',        '模型名称')
 add_arg('config_name',              str,    'cam++.yml',        '配置文件名称')
 add_arg('data_augment_configs', str,    'augmentation.yml', '数据增强配置文件')
-add_arg("use_gpu",              bool,   False,                       '是否使用GPU训练')
+add_arg("use_gpu",              bool,   True,                       '是否使用GPU训练')
 add_arg('save_model_path',      str,    'models/',                  '模型保存的路径')
 add_arg('log_dir',              str,    'log/',                     '保存VisualDL日志文件的路径')
 add_arg('resume_model',         str,    None,                       '恢复训练，当为None则不使用预训练模型')

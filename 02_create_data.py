@@ -120,7 +120,7 @@ def create_model_label(audio_path, label_path):
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser(description=__doc__)
     add_arg = functools.partial(add_arguments, argparser=parser)
-    add_arg('model_name',          str,    'dog_cat',        '模型名称')
+    add_arg('model_name',          str,    'dog',        '模型名称')
     args = parser.parse_args()
     print_arguments(args=args)
 
